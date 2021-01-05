@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const StatusBar = ({ avitar }) => {
+
+const StatusBar = ({ children }) => {
   const [pos, setPos] = useState(0)
   const [inc, setInc] = useState(10)
 
   // TODO: Make position a scale to cover the entire box for dynamic sizing
-  // TODO: Make unique refrence for the component so multiple components can be run at the same time
-
+  const buttonEl = useRef()
+  const animateEl = useRef()
   const handleClick = () => {
     // Move increment the position by the increment
     setPos(p => {
@@ -20,7 +21,7 @@ const StatusBar = ({ avitar }) => {
 
   useEffect(() => {
     // animate element movement from current pos to state pos
-    document.getElementById("animate").animate([
+    animateEl.current.animate([
       { transform: `translateX(${pos}px)`}
     ], {
       duration: 1000,
@@ -28,14 +29,17 @@ const StatusBar = ({ avitar }) => {
       },
     )
   }, [pos])
-
+  
   return (
-    <>
+    <div className="App-track">
       <div className="App-status-bar">
-        <div id="animate" className="App-animate-avitar"></div>
+        <div ref={animateEl} className="App-animate-avitar">{ children }</div>
       </div>
-      <button onClick={handleClick}>Click to Move</button>
-    </>
+      <div>
+        <button ref={buttonEl} onClick={handleClick}>Click to Move</button>
+      </div>
+      
+    </div>
   )
 }
 
