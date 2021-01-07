@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 
 const Passage = ({ passage }) => {
-  const [typedInput, setTypedInput] = useState('')
+  // const [typedInput, setTypedInput] = useState('')
+  // const [error, setError] = useState(() => ({error: false, errorIndex: passage.length}))
   /*
   The current state must know the current index to be evaluated,
   the current word -> This is displayed as entered in the input:
@@ -26,60 +27,129 @@ const Passage = ({ passage }) => {
 
   }
   */
-  const [error, setError] = useState(() => ({error: false, errorIndex: passage.length}))
+ const [state, setState] = useState({
+   input: '',
+   currentWord: passage.split(' ')[0],
+   currentWordIndex: 0,
+   error: false,
+   errorIndex: 0
+ })
+  
+ 
 
   useEffect(() => {
     // Create event listener to monitor keydown event on keyboard
-    window.addEventListener('keydown', (e) => setTypedInput(cur => cur + e.key))
+    // Add the key to state
+    const KEYS = 
+      { 
+        doNothing: [
+         "Shift",
+         'CapLocks',
+         'Tab',
+         'Control',
+         'Alt',
+         'Meta',
+         'Enter',
+         'Home',
+         'End',
+         'PageUp',
+         'PageDown',
+         'ArrowUp',
+         'ArrowDown'
+       ],
+       remove: [
+         'Backspace',
+         'Delete',
+         'Clear'
+       ],
+       move: [
+         'ArrowRight',
+         'ArrowLeft',
+       ]
+     }
+
+    const mapKey = (e) => {
+      if (KEYS.doNothing.includes(e.key)) {
+        console.log('do nothing')
+      }
+      else if (KEYS.remove.includes(e.key)) {
+        switch (e.key){
+          case 'Backspace':
+            setState(state => (
+              {
+                ...state,
+                input: state.input.slice(0, -1)
+              }
+            ))
+            break;
+          default:
+            break;
+
+        }
+      } else if (KEYS.move.includes(e.key)){
+        console.log('move')
+      }
+      else{
+        setState(state => (
+          {
+            ...state,
+            input: state.input + e.key
+          }
+        ))
+      }
+
+    }
+    window.addEventListener('keydown', (e) => mapKey(e))
     return () => {
-      window.removeEventListener('keydown', (e) => setTypedInput(cur => cur + e.key))
+      window.removeEventListener('keydown', (e) => mapKey(e))
     }
   }, [])
 
-  useEffect(() => {
-    const validateTypedKey = () => {
+  // useEffect(() => {
+  //   // Validate the typed key
+  //   const validateTypedKey = () => {
 
-      if (passage.slice(0, typedInput.length) !== typedInput && !error.error){
-        setError(
-          {
-            error: true,
-            errorIndex: typedInput.length - 1
-          }
-        )
-    }}
+  //     if (passage.slice(0, typedInput.length) !== typedInput && !error.error){
+  //       setError(
+  //         {
+  //           error: true,
+  //           errorIndex: typedInput.length - 1
+  //         }
+  //       )
+  //   }}
 
-    validateTypedKey()
-  }, [passage, error, typedInput])
+  //   validateTypedKey()
+  // }, [passage, error, typedInput])
   
 
-  const getValidText = () => {
-    return (
-      <div>
-        {error.error
-      ? (
-        <>
-        <span className="Valid-text">{passage.slice(0, error.errorIndex)}</span>
-        <span className="Invalid-text">{passage.slice(error.errorIndex, typedInput.length)}</span>
-        {passage.slice(typedInput.length)}
-        </>
-      )
-      : (
-        <>
-        <span className="Valid-text">{passage.slice(0, typedInput.length)}</span>
-        {passage.slice(typedInput.length)}
-        </>
-      )     } 
-      </div>
+  // const getValidText = () => {
+  //   return (
+  //     <div>
+  //       {error.error
+  //     ? (
+  //       <>
+  //       <span className="Valid-text">{passage.slice(0, error.errorIndex)}</span>
+  //       <span className="Invalid-text">{passage.slice(error.errorIndex, typedInput.length)}</span>
+  //       {passage.slice(typedInput.length)}
+  //       </>
+  //     )
+  //     : (
+  //       <>
+  //       <span className="Valid-text">{passage.slice(0, typedInput.length)}</span>
+  //       {passage.slice(typedInput.length)}
+  //       </>
+  //     )     } 
+  //     </div>
       
       
-      )
-  }
+  //     )
+  // }
   
 
   return (
     <div className="App-passage">
       <div className="App-passage-text">
-        {getValidText()}
+        
       </div>
       <div className="App-passage-input">
         <input type="text"/>
