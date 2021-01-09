@@ -105,45 +105,38 @@ const Passage = ({ passage }) => {
     }
   }, [])
 
-  // useEffect(() => {
-  //   // Validate the typed key
-  //   const validateTypedKey = () => {
-
-  //     if (passage.slice(0, typedInput.length) !== typedInput && !error.error){
-  //       setError(
-  //         {
-  //           error: true,
-  //           errorIndex: typedInput.length - 1
-  //         }
-  //       )
-  //   }}
-
-  //   validateTypedKey()
-  // }, [passage, error, typedInput])
+  useEffect(() => {
+    const {currentWord, input, error} = state
+    
+    console.log(currentWord, input)
+    if (currentWord && currentWord.indexOf(input) === 0) {
+      console.log('Valid!')
+      if (currentWord === input) {
+        // TODO: Moving to next word needs to consider the space unless the next word is undefiend
+        console.log('Next Word!')
+        setState(state => (
+          {
+            ...state,
+            input: '',
+            currentWord: passage.split(' ')[state.currentWordIndex + 1],
+            currentWordIndex: state.currentWordIndex + 1,
+            error: false,
+            errorIndex: 0
+          }
+        ))
+      }
+    } else if (!error){
+      console.log('Invalid!')
+      setState( state => (
+        {
+          ...state,
+          error: true,
+          errorIndex: state.input.length - 1
+        }
+      ))
+    }
+  }, [state, passage])
   
-
-  // const getValidText = () => {
-  //   return (
-  //     <div>
-  //       {error.error
-  //     ? (
-  //       <>
-  //       <span className="Valid-text">{passage.slice(0, error.errorIndex)}</span>
-  //       <span className="Invalid-text">{passage.slice(error.errorIndex, typedInput.length)}</span>
-  //       {passage.slice(typedInput.length)}
-  //       </>
-  //     )
-  //     : (
-  //       <>
-  //       <span className="Valid-text">{passage.slice(0, typedInput.length)}</span>
-  //       {passage.slice(typedInput.length)}
-  //       </>
-  //     )     } 
-  //     </div>
-      
-      
-  //     )
-  // }
   
 
   return (
