@@ -15,7 +15,7 @@ const GameTimer = ({stopTimer}) =>{
   useEffect(() => {
     if (stopTimer) {
       console.log('stoping timer')
-    clearInterval(timerId.current)
+      clearInterval(timerId.current)
     }
     
   }, [stopTimer])
