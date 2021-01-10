@@ -32,7 +32,8 @@ const Passage = ({ passage }) => {
    currentWord: passage.split(' ')[0],
    currentWordIndex: 0,
    error: false,
-   errorIndex: 0
+   errorIndex: 0,
+   spaceToClear: false
  })
   
  
@@ -106,12 +107,44 @@ const Passage = ({ passage }) => {
   }, [])
 
   useEffect(() => {
-    const {currentWord, input, error} = state
+    const {currentWord, input, error, spaceToClear} = state
     
     console.log(currentWord, input)
-    if (currentWord && currentWord.indexOf(input) === 0) {
+
+    if (spaceToClear) {
+      if (input.slice(-1) === ' ') {
+          // Word cleared, move to next word
+          setState(state => (
+            {
+              ...state,
+              input: '',
+              currentWord: passage.split(' ')[state.currentWordIndex + 1],
+              currentWordIndex: state.currentWordIndex + 1,
+              error: false,
+              errorIndex: 0,
+              spaceToClear: false
+            }
+          ))
+      } else {
+        // set error, space required
+        setState( state => (
+          {
+            ...state,
+            error: true,
+            errorIndex: state.input.length - 1
+          }
+        ))
+      }
+    } else if (currentWord && currentWord.indexOf(input) === 0) {
       console.log('Valid!')
       if (currentWord === input) {
+        console.log('Valid word... space to clear')
+        setState(state => (
+          {
+            ...state,
+            spaceToClear: true
+          }
+        ))
         // TODO: Moving to next word needs to consider the space unless the next word is undefiend
         console.log('Next Word!')
         setState(state => (
