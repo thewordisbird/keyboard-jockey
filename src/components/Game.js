@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import GameStatus from './GameStatus';
 import GamePassage from './GamePassage';
 import GameInput from './GameInput';
+import GameTimer from './GameTimer';
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
@@ -138,6 +139,7 @@ const Game = ({ passage }) => {
 
   return (
     <div className="App-game">
+      <GameTimer stopTimer={gameState.finished}/>
       <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
         <i className="fas fa-truck-pickup fa-3x"/>
       </GameStatus>
