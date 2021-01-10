@@ -2,9 +2,12 @@ import React, {useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import GameStatus from './GameStatus';
+import PlayerStats from './PlayerStats'
 import GamePassage from './GamePassage';
 import GameInput from './GameInput';
 import GameTimer from './GameTimer';
+
+import useTimer from '../hooks/useTimer';
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
@@ -12,8 +15,11 @@ const Game = ({ passage }) => {
     inputString: '',
     error: false,
     errorIndex: -1,
-    finished: false
+    finished: false,
+    wordCount: 0
   })
+
+  const time = useTimer(gameState.finished)
 
   // On keydown effect
   useEffect(() => {
@@ -118,7 +124,8 @@ const Game = ({ passage }) => {
      setGameState(state => (
        {
          ...state,
-         display: ''
+         display: '',
+         wordCount: state.wordCount + 1
        }
      ))
    }
@@ -132,6 +139,7 @@ const Game = ({ passage }) => {
          ...state,
          display: '',
          finished: true,
+         wordCount: state.wordCount + 1
        }
      ))
    }
@@ -139,14 +147,20 @@ const Game = ({ passage }) => {
 
   return (
     <div className="App-game">
-      <GameTimer stopTimer={gameState.finished}/>
-      <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
-        <i className="fas fa-truck-pickup fa-3x"/>
-      </GameStatus>
+      <GameTimer seconds={time}/>
+      <div className="App-status">
+        <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
+          <i className="fas fa-truck-pickup fa-3x"/>
+        </GameStatus>
+        <PlayerStats position={1} pace={Math.round(gameState.wordCount/(time/60))} />
+      </div>
+      
+      
       <div className="App-passage">
         <GamePassage passage={passage} inputLength={gameState.inputString.length} error={gameState.error} errorIndex={gameState.errorIndex} />
         <GameInput display={gameState.display} error={gameState.error} /> 
       </div>
+      {gameState.wordCount}
     </div>
   )
 }

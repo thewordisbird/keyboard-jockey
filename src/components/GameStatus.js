@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 
 const StatusBar = ({ passageLength, position, children }) => {
@@ -10,7 +10,6 @@ const StatusBar = ({ passageLength, position, children }) => {
   const animateEl = useRef();
   
   useEffect(() => {
-    console.log('in animate')
     const width = statusBarEl.current.clientWidth
     const scaledPosition = position * increment * width
     // animate element movement from current pos to state pos
@@ -28,10 +27,6 @@ const StatusBar = ({ passageLength, position, children }) => {
       <div ref={statusBarEl} className="App-status-bar">
         <div ref={animateEl} className="App-animate-avitar">{ children }</div>
       </div>
-      {/* <div>
-        <button ref={buttonEl} onClick={handleClick}>Click to Move</button>
-      </div> */}
-      
     </div>
   )
 }
