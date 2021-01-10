@@ -1,11 +1,17 @@
 import React, {useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+
+import GameStatus from './GameStatus';
+import GamePassage from './GamePassage';
+import GameInput from './GameInput';
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
     display: '',
     inputString: '',
     error: false,
-    errorIndex: -1
+    errorIndex: -1,
+    finished: false
   })
 
   // On keydown effect
@@ -82,6 +88,7 @@ const Game = ({ passage }) => {
   // Validate inpute effect
  useEffect(() => {
    const {inputString, error} = gameState;
+
    if (!error && passage.slice(0, inputString.length) !== inputString) {
      // Trigger Error
       setGameState(state => (
@@ -116,28 +123,32 @@ const Game = ({ passage }) => {
    }
  }, [gameState.display])
 
+ // Finish game
+ useEffect(() => {
+   if (gameState.inputString === passage){
+     setGameState(state => (
+       {
+         ...state,
+         display: '',
+         finished: true,
+       }
+     ))
+   }
+ }, [gameState.inputString])
+
   return (
-    <div className="App-passage">
-      <div className="App-passage-text">
-        { gameState.error
-          ? (
-            <>
-            <span style={{background: 'lightgreen'}}>{passage.slice(0, gameState.errorIndex)}</span>
-            <span style={{background: 'lightpink'}}>{passage.slice(gameState.errorIndex, gameState.inputString.length)}</span>
-            </>
-          )
-        : (
-          <span style={{background: 'lightgreen'}}>{passage.slice(0, gameState.inputString.length)}</span>
-        )}
-        {passage.slice(gameState.inputString.length)}
+    <div className="App-game">
+      <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
+        <i className="fas fa-truck-pickup fa-3x"/>
+      </GameStatus>
+      <div className="App-passage">
+        <GamePassage passage={passage} inputLength={gameState.inputString.length} error={gameState.error} errorIndex={gameState.errorIndex} />
+        <GameInput display={gameState.display} error={gameState.error} /> 
       </div>
-      <div className="App-passage-input">
-        <input type="text" value={gameState.display} readOnly/>
-  
-      </div>
-      
     </div>
   )
 }
-
+Game.propTypes = {
+  passage: PropTypes.string.isRequired
+}
 export default Game;

@@ -54,9 +54,15 @@
 .App-passage-input{
     margin: 10px;
 }
-input {
+.App-passage-input input {
     width: 95%;
 }
+
+.App-passage-input input .error{
+    background: lightcoral;
+    color: darkgray;
+}
+
 
 .Valid-text{
     background: lightgreen;
