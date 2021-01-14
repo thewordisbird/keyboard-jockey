@@ -8,6 +8,8 @@ import GameInput from './GameInput';
 import GameTimer from './GameTimer';
 
 import useTimer from '../hooks/useTimer';
+// import StartGame from './StartGame';
+// import useCountDown from '../hooks/useCountdown';
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
@@ -16,8 +18,18 @@ const Game = ({ passage }) => {
     error: false,
     errorIndex: -1,
     finished: false,
-    wordCount: 0
+    wordCount: 0,
+    initGame: false
   })
+
+  const handleStartGame = () => {
+    setGameState(state => (
+      {
+        ...state,
+        initGame: true
+      }
+    ))
+  }
 
   const time = useTimer(gameState.finished)
 
@@ -160,7 +172,8 @@ const Game = ({ passage }) => {
         <GamePassage passage={passage} inputLength={gameState.inputString.length} error={gameState.error} errorIndex={gameState.errorIndex} />
         <GameInput display={gameState.display} error={gameState.error} /> 
       </div>
-      {gameState.wordCount}
+      { gameState.initGame ? '' : <button onClick={handleStartGame}>Start Game</button>}
+      
     </div>
   )
 }
