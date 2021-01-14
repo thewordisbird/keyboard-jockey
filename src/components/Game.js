@@ -13,13 +13,14 @@ import useTimer from '../hooks/useTimer';
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
-    display: '',
-    inputString: '',
+    validatedInput: '', // Input string that has been cleared on a space
+    activeInput:'', // Value shown in input
+    passageIdx: 0,
     error: false,
     errorIndex: -1,
+    initGame: false,
     finished: false,
-    wordCount: 0,
-    initGame: false
+    wordCount: 0,    
   })
 
   const handleStartGame = () => {
@@ -33,144 +34,108 @@ const Game = ({ passage }) => {
 
   const time = useTimer(gameState.finished)
 
-  // On keydown effect
-  useEffect(() => {
-    // Create event listener to monitor keydown event on keyboard
-    // Add the key to state
-    const KEYS = 
-      { 
-        doNothing: [
-         "Shift",
-         'CapLocks',
-         'Tab',
-         'Control',
-         'Alt',
-         'Meta',
-         'Enter',
-         'Home',
-         'End',
-         'PageUp',
-         'PageDown',
-         'ArrowUp',
-         'ArrowDown'
-       ],
-       remove: [
-         'Backspace',
-         'Delete',
-         'Clear'
-       ],
-       move: [
-         'ArrowRight',
-         'ArrowLeft',
-       ]
-     }
+ const validateInput = (inputString) => {
+    if (!gameState.error && passage.slice(0, inputString.length) !== inputString) {
+      return false
+    } else {
+      return true
+    }
+  }
 
-    const mapKey = (e) => {
-      if (KEYS.doNothing.includes(e.key)) {
-        console.log('do nothing')
+  const findError = (inputString) => {
+    // Find error. Because the user could move around in the input,
+      // it might not be the last character, but it will be in the last word.
+      let idx = gameState.validatedInput.length;
+      console.log('start idx', idx)
+      while (idx < inputString.length && passage.slice(0, idx + 1) === inputString.slice(0,idx + 1)) {
+        idx++
       }
-      else if (KEYS.remove.includes(e.key)) {
-        switch (e.key){
-          case 'Backspace':
-            setGameState(state => (
-              {
-                ...state,
-                inputString: state.inputString.slice(0, -1),
-                display: state.display.length > 0 ? state.display.slice(0, -1) : state.display
-              }
-            ))
-            break;
-          default:
-            break;
+      return idx
+  }
 
-        }
-      } else if (KEYS.move.includes(e.key)){
-        console.log('move')
-      }
-      else{
+  const handleInput = (e) => {
+    const inputString = gameState.validatedInput + e.target.value
+    
+    if (validateInput(inputString)) {
+      if (e.target.value.slice(-1) === ' '){
+        // Clear valid word input
         setGameState(state => (
           {
             ...state,
-            inputString: state.inputString + e.key,
-            display: state.display + e.key
+            validatedInput: inputString,
+            passageIdx: inputString.length,
+            error: false,
+            errorIdx: -1
+          }
+        ))
+        // Clear Input
+
+      } else {
+        // Increment passageIdx and clear errors if any
+        setGameState(state => (
+          {
+            ...state, 
+            passageIdx: inputString.length,
+            error: false,
+            errorIdx: -1
           }
         ))
       }
-
-    }
-    window.addEventListener('keydown', (e) => mapKey(e))
-    return () => {
-      window.removeEventListener('keydown', (e) => mapKey(e))
-    }
-  }, [])
-
-  // Validate inpute effect
- useEffect(() => {
-   const {inputString, error} = gameState;
-
-   if (!error && passage.slice(0, inputString.length) !== inputString) {
-     // Trigger Error
+    } else {
+      // Error
       setGameState(state => (
         {
           ...state,
+          passageIdx: inputString.length,
           error: true,
-          errorIndex: inputString.length - 1
+          errorIdx: state.errorIdx === -1 ? inputString.length : state.errorIndex
         }
       ))
-   } else if (error && passage.slice(0, inputString.length) === inputString){
-    // Clear Error
-    setGameState(state => (
-      {
-        ...state,
-        error: false,
-        errorIndex: - 1
-      }
-    ))
-   }
- }, [gameState.inputString])
+    }
+  }
 
- // Reset Input
- useEffect(() => {
-   const { error, display } = gameState;
-   if (!error && display.slice(-1) === ' ') {
-     setGameState(state => (
-       {
-         ...state,
-         display: '',
-         wordCount: state.wordCount + 1
-       }
-     ))
-   }
- }, [gameState.display])
+//  // Reset Input
+//  useEffect(() => {
+//    const { error, display } = gameState;
+//    if (!error && display.slice(-1) === ' ') {
+//      setGameState(state => (
+//        {
+//          ...state,
+//          display: '',
+//          wordCount: state.wordCount + 1
+//        }
+//      ))
+//    }
+//  }, [gameState.display])
 
- // Finish game
- useEffect(() => {
-   if (gameState.inputString === passage){
-     setGameState(state => (
-       {
-         ...state,
-         display: '',
-         finished: true,
-         wordCount: state.wordCount + 1
-       }
-     ))
-   }
- }, [gameState.inputString])
-
+//  // Finish game
+//  useEffect(() => {
+//    if (gameState.inputString === passage){
+//      setGameState(state => (
+//        {
+//          ...state,
+//          display: '',
+//          finished: true,
+//          wordCount: state.wordCount + 1
+//        }
+//      ))
+//    }
+//  }, [gameState.inputString])
+  console.log('passage: ', passage)
   return (
     <div className="App-game">
       <GameTimer seconds={time}/>
       <div className="App-status">
-        <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
+        {/* <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIndex : gameState.inputString.length}>
           <i className="fas fa-truck-pickup fa-3x"/>
         </GameStatus>
-        <PlayerStats position={1} pace={Math.round(gameState.wordCount/(time/60))} />
+        <PlayerStats position={1} pace={Math.round(gameState.wordCount/(time/60))} /> */}
       </div>
       
       
       <div className="App-passage">
-        <GamePassage passage={passage} inputLength={gameState.inputString.length} error={gameState.error} errorIndex={gameState.errorIndex} />
-        <GameInput display={gameState.display} error={gameState.error} /> 
+        <GamePassage passage={passage} inputLength={gameState.passageIdx} error={gameState.error} errorIndex={gameState.errorIndex} />
+        <GameInput  error={gameState.error} handleInput={handleInput} /> 
       </div>
       { gameState.initGame ? '' : <button onClick={handleStartGame}>Start Game</button>}
       
