@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const GamePassage = ({ passage, inputLength, error, errorIndex }) => (
+const GamePassage = ({ passage, inputLength, error, errorIdx }) => (
     <div className="App-passage-text">
       { 
         error
           ? (
             <>
-              <span style={{background: 'lightgreen'}}>{passage.slice(0, errorIndex)}</span>
-              <span style={{background: 'lightpink'}}>{passage.slice(errorIndex, inputLength)}</span>
+              <span style={{background: 'lightgreen'}}>{passage.slice(0, errorIdx)}</span>
+              <span style={{background: 'lightpink'}}>{passage.slice(errorIdx, inputLength)}</span>
             </>
           )
           : (
@@ -22,7 +22,7 @@ GamePassage.propTypes = {
   passage: PropTypes.string.isRequired,
   inputLength: PropTypes.number.isRequired,
   error: PropTypes.bool.isRequired,
-  errorIndex: PropTypes.number.isRequired
+  errorIdx: PropTypes.number.isRequired
 }
 export default GamePassage
   

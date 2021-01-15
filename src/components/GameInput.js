@@ -1,16 +1,15 @@
 
 import PropTypes from 'prop-types';
 
-const GameInput = ({ display, error, handleInput }) => {
+const GameInput = ({ input, error, handleInput }) => {
  
   return (
 <div className="App-passage-input">
-  <input className={error ? 'Input-error' : ''} type="text" value={display} readOnly/>
-  <input type="text" autoFocus={true} onChange={(e) => handleInput(e)}/>
+  <input type="text" autoFocus={true} value={input} onChange={(e) => handleInput(e)}/>
 </div>
 )}
 GameInput.propTypes = {
-  display: PropTypes.string,
+  input: PropTypes.string.isRequired,
   error: PropTypes.bool.isRequired,
   handleInput: PropTypes.func.isRequired
 }

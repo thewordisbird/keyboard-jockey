@@ -3,7 +3,7 @@ import useCountDown from '../hooks/useCountdown'
 import GameTimer from './GameTimer'
 import './StartGame.css'
 
-const StartGame = () => {
+const GameStart = ({ onGameStart }) => {
     const time = useCountDown(10)
     return (
         <>
@@ -25,4 +25,4 @@ const StartGame = () => {
     )
 }
 
-export default StartGame
+export default GameStart
