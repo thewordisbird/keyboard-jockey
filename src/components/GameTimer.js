@@ -1,13 +1,13 @@
 import React, {useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
-const GameTimer = ({seconds}) => (
+const GameTimer = ({ time }) => (
   <div className="App-timer">
-    {Math.floor(seconds/60)}:{seconds % 60}
+    {Math.floor(time/60)}:{time % 60}
   </div>  
 )
 GameTimer.propTypes = {
-  seconds: PropTypes.number.isRequired
+  time: PropTypes.number.isRequired
 }
 
 

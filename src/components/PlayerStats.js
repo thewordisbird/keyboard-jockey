@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const PlayerStats = ({ position, pace }) =>(
   <div className="App-player-stats">
-    { position }<br/>{pace}WPM
+    {pace} WPM
   </div>
 )
 PlayerStats.propTypes ={

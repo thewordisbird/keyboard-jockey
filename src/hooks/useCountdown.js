@@ -1,24 +1,43 @@
 import {useState, useEffect, useRef } from 'react';
   
-const useCountDown = (countFrom) => {
-  const [seconds, setSeconds] = useState(countFrom)
+const useCountDown = () => {
+  const [seconds, setSeconds] = useState(null)
+  const [toggle, setToggle] = useState(false)
   const timerId = useRef()
   
   useEffect(() => {
     timerId.current = setInterval(() => {
-      setSeconds(seconds => seconds - 1)
+      if (toggle) {
+        setSeconds(seconds => seconds - 1)
+      }
     }, 1000)
     return () => {
       clearInterval(timerId.current)
     }
-  }, [])
+  }, [toggle])
 
   useEffect(() => {
-    if (seconds === 0) {
+    if (seconds === -1) {
       clearInterval(timerId.current)
+      setToggle(false)
     }
   }, [seconds])
   
-  return seconds;
+  const startCountDown = (startTime) => {
+    console.log('setting countdown to:', startTime)
+    setSeconds(startTime)
+    setToggle(true)
+  }
+
+  const countDownStatus = () => {
+    return toggle
+  }
+  return (
+    {
+      countDownTime: seconds,
+      startCountDown: startCountDown,
+      countDownStatus: countDownStatus
+    }
+  )
 }
 export default useCountDown;

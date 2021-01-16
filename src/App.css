@@ -98,3 +98,63 @@
 .Invalid-text{
     background-color: lightpink;
 }
+
+.App-countdown{    
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  transition: all 250ms linear;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.App-timer{
+  margin-left: 10px;
+  font-size: 45px;
+  
+}
+.Start-light-container{
+  width: 200px;
+  height: 50px;
+  background: grey;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.Start-light{
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 1px solid black;
+  background: lightgray;
+}
+
+.Start-light-red{
+  background: red;
+}
+
+.Start-light-yellow{
+  background:yellow;
+}
+
+.Start-light-green{
+  background: green;
+}

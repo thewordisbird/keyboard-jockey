@@ -6,11 +6,15 @@ import PlayerStats from './PlayerStats'
 import GamePassage from './GamePassage';
 import GameInput from './GameInput';
 import GameTimer from './GameTimer';
-
+import Fade from './Fade';
 import useTimer from '../hooks/useTimer';
-import GameStart from './GameStart';
 import useCountDown from '../hooks/useCountdown';
+import GameCountdown from './GameCountdown';
+import GameLight from './GameLight';
 // import useCountDown from '../hooks/useCountdown';
+
+// Set globals
+const COUNTDOWN_TIMER = 10
 
 const Game = ({ passage }) => {
   const [gameState, setGameState] = useState({
@@ -21,34 +25,103 @@ const Game = ({ passage }) => {
     error: false,
     errorIdx: -1,
     inGame: false,
-    startCountDown: false,
+    displayCountDown: false,
     startGame: false,
     finishGame: false,
     wordCount: 0,  
   })
 
+  
+  // Custom Hooks
+  const { countDownTime, startCountDown, countDownStatus } = useCountDown()
+  const { time, startTimer, stopTimer } = useTimer()
+
+  // *** Side Effects ***
+  useEffect(() => {
+    // Start the game when the countdown finishes
+    if (countDownTime === 0) {
+      startTimer()
+      setGameState(state => (
+        {
+          ...state,
+          displayCountDown: false,
+          startGame: true
+        }
+      ))
+    }
+  }, [countDownTime])
+
+ useEffect(() => {
+   // Reset Input on space if valid
+  console.log('In effect')
+  const { error, input } = gameState;
+  if (!error && input.slice(-1) === ' ') {
+    setGameState(state => (
+      {
+        ...state,
+        input: '',
+        validInput: state.validInput + input,
+        wordCount: state.wordCount + 1
+      }
+    ))
+  }
+}, [gameState.input])
+
+useEffect(() => {
+  // Finish game when input matches passage
+  if (gameState.validInput + gameState.input === passage){
+    stopTimer()
+    setGameState(state => (
+      {
+        ...state,
+        input: '',
+        validInput: state.validInput + state.input,
+        finishGame: true,
+        wordCount: state.wordCount + 1
+      }
+    ))
+  }
+}, [gameState.input])
+
+
+// *** Handlers ***
   const handleStartCountDown = () => {
+    startCountDown(COUNTDOWN_TIMER)
     setGameState(state => (
       {
         ...state,
         inGame: true,
-        startCountDown: true
+        displayCountDown: true
       }
     ))
   }
 
-  const handleStartGame = () => (
-    setGameState(state => (
-      {
-        ...state,
-        startCountDown: false,
-        startGame: true
+  const handleInput = (e) => {
+    if (gameState.startGame){
+      if (validateInput(e.target.value)) {      
+        setGameState(state => (
+          {
+            ...state,
+            input: e.target.value,
+            error: false,
+            errorIdx: -1          
+          }
+        ))
+      } else {
+        // Error
+        setGameState(state => (
+          {
+            ...state,
+            input: e.target.value,
+            error: true,
+            errorIdx: state.errorIdx === -1 ? findError(e.target.value) : state.errorIdx
+          }
+        ))
       }
-    ))
-  )
+    }
+  }
 
-  // const time = useTimer(gameState.finishGame)
-
+  // *** Helpers ***
  const validateInput = (inputString) => {
    const insepectFrom = gameState.validInput.length
     if (passage.slice(insepectFrom, insepectFrom + inputString.length) !== inputString) {
@@ -73,71 +146,22 @@ const Game = ({ passage }) => {
       return idx - 1
   }
 
-  const handleInput = (e) => {
-    console.log('handling input', e.target.value)
-    if (validateInput(e.target.value)) {
-      
-      setGameState(state => (
-        {
-          ...state,
-          input: e.target.value,
-          error: false,
-          errorIdx: -1          
-        }
-      ))
-    } else {
-      // Error
-      setGameState(state => (
-        {
-          ...state,
-          input: e.target.value,
-          error: true,
-          errorIdx: state.errorIdx === -1 ? findError(e.target.value) : state.errorIdx
-        }
-      ))
-    }
-  }
-
- // Reset Input
- useEffect(() => {
-   console.log('In effect')
-   const { error, input } = gameState;
-   if (!error && input.slice(-1) === ' ') {
-     setGameState(state => (
-       {
-         ...state,
-         input: '',
-         validInput: state.validInput + input,
-         wordCount: state.wordCount + 1
-       }
-     ))
-   }
- }, [gameState.input])
-
- // Finish game
- useEffect(() => {
-   if (gameState.validInput + gameState.input === passage){
-     setGameState(state => (
-       {
-         ...state,
-         input: '',
-         validInput: state.validInput + state.input,
-         finishGame: true,
-         wordCount: state.wordCount + 1
-       }
-     ))
-   }
- }, [gameState.input])
   return (
     <div className="App-game">
-      {gameState.startCountDown && <GameStart onGameStart= {handleStartGame} />}
-      {gameState.startGame && <GameTimer />}
+      <Fade display={gameState.displayCountDown}>
+        <GameCountdown display={gameState.displayCountDown}>
+            <GameLight time={countDownTime} />
+            <GameTimer time={countDownTime} />
+          </GameCountdown>
+      </Fade>
+      
+      {gameState.startGame && <GameTimer time={time}/>}
       
       <div className="App-status">
         <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
           <i className="fas fa-truck-pickup fa-3x"/>
         </GameStatus>
-        {/* <PlayerStats position={1} pace={Math.round(gameState.wordCount/(time/60))} /> */}
+        <PlayerStats pace={Math.round(gameState.wordCount/(time/60)) || 0} />
       </div>
       { gameState.inGame 
         ? (
