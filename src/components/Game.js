@@ -31,7 +31,6 @@ const Game = ({ passage }) => {
     wordCount: 0,  
   })
 
-  
   // Custom Hooks
   const { countDownTime, startCountDown, countDownStatus } = useCountDown()
   const { time, startTimer, stopTimer } = useTimer()
@@ -147,33 +146,78 @@ useEffect(() => {
   }
 
   return (
-    <div className="App-game">
-      <Fade display={gameState.displayCountDown}>
-        <GameCountdown display={gameState.displayCountDown}>
-            <GameLight time={countDownTime} />
-            <GameTimer time={countDownTime} />
-          </GameCountdown>
-      </Fade>
-      
-      {gameState.startGame && <GameTimer time={time}/>}
-      
-      <div className="App-status">
-        <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-          <i className="fas fa-truck-pickup fa-3x"/>
-        </GameStatus>
-        <PlayerStats pace={Math.round(gameState.wordCount/(time/60)) || 0} />
-      </div>
-      { gameState.inGame 
-        ? (
-          <div className="App-passage">
-            <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
-            <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
+    <div className="container">
+      <div className="App-game">
+        <div className="App-sidebar">
+          <GameLight time={6}/>
+          <GameTimer time={6}/>
+        </div>
+        <div className="App-main">
+          <div className="App-game-status">
+            <div className="App-player-status">
+              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+                <i className="fas fa-truck-pickup fa-3x"/>
+              </GameStatus>
+              <PlayerStats pace={50} />
+            </div>
+            <div className="App-player-status">
+              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+                <i className="fas fa-truck-pickup fa-3x"/>
+              </GameStatus>
+              <PlayerStats pace={50} />
+            </div>
+            <div className="App-player-status">
+              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+                <i className="fas fa-truck-pickup fa-3x"/>
+              </GameStatus>
+              <PlayerStats pace={50} />
+            </div>
+            <div className="App-player-status">
+              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+                <i className="fas fa-truck-pickup fa-3x"/>
+              </GameStatus>
+              <PlayerStats pace={50} />
+            </div>
+           
           </div>
-        )  : (
-        <button onClick={handleStartCountDown}>Start Game</button>
-        )
-      }
+          <div className="App-game-challange">
+            <div className="App-passage">
+              <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
+              <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+
+    // <div className="App-game">
+    //   <Fade display={gameState.displayCountDown}>
+    //     <GameCountdown display={gameState.displayCountDown}>
+    //         <GameLight time={countDownTime} />
+    //         <GameTimer time={countDownTime} />
+    //       </GameCountdown>
+    //   </Fade>
+      
+    //   {gameState.startGame && <GameTimer time={time}/>}
+      
+    //   <div className="App-status">
+    //     <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+    //       <i className="fas fa-truck-pickup fa-3x"/>
+    //     </GameStatus>
+    //     <PlayerStats pace={Math.round(gameState.wordCount/(time/60)) || 0} />
+    //   </div>
+    //   { gameState.inGame 
+    //     ? (
+    //       <div className="App-passage">
+    //         <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
+    //         <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
+    //       </div>
+    //     )  : (
+    //     <button onClick={handleStartCountDown}>Start Game</button>
+    //     )
+    //   }
+    // </div>
   )
 }
 Game.propTypes = {

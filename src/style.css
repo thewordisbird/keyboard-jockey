@@ -1,0 +1,147 @@
+.App-game {
+  margin:25px;
+  display:  flex;
+  justify-content: space-evenly;
+  height: 80vh;
+}
+
+/* Sidebar Component Styling */
+.App-sidebar {
+  border: solid 1px lightblue;
+  border-radius: 5px;
+  background: #f6fbff;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 2px;
+  width: 15%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.Start-light-container{
+  width: 70%;
+  height: 70%;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, .65);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.Start-light{
+  width: 0;
+  height: 25%;
+  padding-right: 75%;
+  border-radius: 50%;
+  border: 1px solid black;
+  background: lightgray;
+}
+
+.Start-light-red{
+  background: red;
+}
+
+.Start-light-yellow{
+  background:yellow;
+}
+
+.Start-light-green{
+  background: green;
+}
+
+.App-timer{
+  margin-left: 10px;
+  font-size: 48px;
+  color: rgba(0, 0, 0, .65);
+  
+}
+
+.App-main {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.App-game-status {
+  border: solid 1px lightblue;
+  border-radius: 5px;
+  background: #f6fbff;
+  font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 25px;
+  margin-bottom: 15px;
+}
+.App-player-status {
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 25px;
+}
+
+.App-track{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 85%;
+  margin-left: 10px
+}
+.App-status-bar {
+  width: 95%;
+  height: 30px;
+  border-bottom: dashed 2px gray;
+  position: relative;
+  margin: 10px;
+}
+
+.App-animate-avitar {
+  /* width: 30px;
+  height: 30px; */
+  position: absolute;
+  /* background: maroon;
+  border-radius: 50%; */
+  top: -15px;
+  color: darkblue;
+}
+
+.App-game-challange {
+  border: solid 1px lightblue;
+  border-radius: 5px;
+  background: #f6fbff;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.App-passage {
+  /* width: 100%;
+  margin: 20px; */
+  background: #f6fbff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+}
+
+.App-passage-text {
+  margin: 10px 0 10px 0;
+}
+.App-passage-input{
+  margin: 10px;
+}
+.App-passage-input input {
+  width: 95%;
+}
+
+.App-passage-input input .error{
+  background: lightcoral;
+  color: darkgray;
+}
+
+
+.Valid-text{
+  background: lightgreen;
+}
+
+.Invalid-text{
+  background-color: lightpink;
+}
