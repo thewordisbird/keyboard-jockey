@@ -5,12 +5,9 @@ import GameStatus from './GameStatus';
 import PlayerStats from './PlayerStats'
 import GamePassage from './GamePassage';
 import GameInput from './GameInput';
-import GameTimer from './GameTimer';
-import Fade from './Fade';
 import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
-import GameCountdown from './GameCountdown';
-import GameLight from './GameLight';
+import Timing from './Timing';
 // import useCountDown from '../hooks/useCountdown';
 
 // Set globals
@@ -22,14 +19,16 @@ const Game = ({ passage }) => {
     // activeInput:'', // Value shown in input
     input: '',
     validInput:  '',
+
     error: false,
     errorIdx: -1,
+    inCountdown: false,
     inGame: false,
     displayCountDown: false,
     startGame: false,
     finishGame: false,
     wordCount: 0,  
-  })
+  });
 
   // Custom Hooks
   const { countDownTime, startCountDown, countDownStatus } = useCountDown()
@@ -39,12 +38,13 @@ const Game = ({ passage }) => {
   useEffect(() => {
     // Start the game when the countdown finishes
     if (countDownTime === 0) {
+      console.log('starting timer')
       startTimer()
       setGameState(state => (
         {
           ...state,
-          displayCountDown: false,
-          startGame: true
+          inCountdown: false,
+          inGame: true
         }
       ))
     }
@@ -89,14 +89,14 @@ useEffect(() => {
     setGameState(state => (
       {
         ...state,
-        inGame: true,
-        displayCountDown: true
+        inCountdown: true,
+        inGame: false,
       }
     ))
   }
 
   const handleInput = (e) => {
-    if (gameState.startGame){
+    if (gameState.inGame){
       if (validateInput(e.target.value)) {      
         setGameState(state => (
           {
@@ -149,8 +149,12 @@ useEffect(() => {
     <div className="container">
       <div className="App-game">
         <div className="App-sidebar">
-          <GameLight time={6}/>
-          <GameTimer time={6}/>
+          <Timing  
+            inCountdown={gameState.inCountdown}
+            inGame={gameState.inGame} 
+            handleStart={handleStartCountDown} 
+            time={gameState.inCountdown ? countDownTime : time} 
+          />
         </div>
         <div className="App-main">
           <div className="App-game-status">
@@ -180,12 +184,16 @@ useEffect(() => {
             </div>
            
           </div>
-          <div className="App-game-challange">
-            <div className="App-passage">
-              <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
-              <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
-            </div>
-          </div>
+          
+            
+            {(gameState.inCountdown || gameState.inGame) &&
+              <div className="App-game-challange">
+                <div className="App-passage">
+                  <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
+                  <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
+                </div>
+              </div>
+            }
         </div>
       </div>
     </div>

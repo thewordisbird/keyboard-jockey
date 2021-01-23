@@ -17,9 +17,11 @@ const useCountDown = () => {
   }, [toggle])
 
   useEffect(() => {
-    if (seconds === -1) {
-      clearInterval(timerId.current)
+    if (seconds === -2) {
       setToggle(false)
+      setSeconds(null)
+      clearInterval(timerId.current)
+      
     }
   }, [seconds])
   

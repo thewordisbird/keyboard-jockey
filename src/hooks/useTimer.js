@@ -1,14 +1,17 @@
 import {useState, useEffect, useRef } from 'react';
   
 const useTimer = () => {
-  const [seconds, setSeconds] = useState(0)
+  const [seconds, setSeconds] = useState(null)
   const [toggle, setToggle] = useState(false)
   const timerId = useRef()
   
   useEffect(() => {
     if (toggle){
     timerId.current = setInterval(() => {
-      setSeconds(seconds => seconds + 1)
+      setSeconds(seconds => {
+        console.log(seconds)
+        return seconds + 1 
+      })
     }, 1000)}
     return () => {
       clearInterval(timerId.current)
@@ -22,7 +25,8 @@ const useTimer = () => {
     }
   }, [toggle])
 
-  const startTimer = () => {
+  const startTimer = (startTime=0) => {
+    setSeconds(startTime)
     setToggle(true)
   }
 
