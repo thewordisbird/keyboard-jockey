@@ -1,17 +1,17 @@
 import React, {useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 
+import Timing from './Timing';
 import GameStatus from './GameStatus';
 import PlayerStats from './PlayerStats'
-import GamePassage from './GamePassage';
-import GameInput from './GameInput';
+import Board from './Board';
+
 import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
-import Timing from './Timing';
-// import useCountDown from '../hooks/useCountdown';
+
+import passages from '../test-passages';
 
 // Set globals
-const COUNTDOWN_TIMER = 10
+const COUNTDOWN_TIMER = 10;
 const INITIAL_STATE = {
   input: '',
   validInput:  '',
@@ -20,16 +20,26 @@ const INITIAL_STATE = {
   inCountdown: false,
   inGame: false,
   playerFinished: false,
-  wordCount: 0,  
-}
+  wordCount: 0,
+  passage:''  
+};
 
+const mockFetch = () => {
+  return new Promise(
+    (resolve, reject) => {
+        setTimeout(() => {
+        resolve(passages[Math.floor(Math.random() * passages.length)]) 
+      }, 1000);
+    }
+  );
+};
 
-const Game = ({ passage }) => {
+const Game = () => {
   const [gameState, setGameState] = useState(INITIAL_STATE);
 
   // Custom Hooks
-  const { countDownTime, startCountDown, countDownStatus } = useCountDown()
-  const { time, startTimer, stopTimer } = useTimer()
+  const { countDownTime, startCountDown, countDownStatus } = useCountDown();
+  const { time, startTimer, stopTimer } = useTimer();
 
   // *** Side Effects ***
   useEffect(() => {
@@ -65,7 +75,7 @@ const Game = ({ passage }) => {
 
 useEffect(() => {
   // Finish game when input matches passage
-  if (gameState.validInput + gameState.input === passage){
+  if (gameState.inGame && (gameState.validInput + gameState.input === gameState.passage)){
     stopTimer()
     setGameState(state => (
       {
@@ -81,17 +91,21 @@ useEffect(() => {
   }
 }, [gameState.input])
 
-
 // *** Handlers ***
   const handleStartCountDown = () => {
-    startCountDown(COUNTDOWN_TIMER);
-    setGameState(
-      {
-        ...INITIAL_STATE,
-        inCountdown: true,
-      }
-    );
-  }
+    // Fetch data from server
+    mockFetch()
+    .then(passage => {
+      startCountDown(COUNTDOWN_TIMER);
+      setGameState(
+        {
+          ...INITIAL_STATE,
+          inCountdown: true,
+          passage: passage.passage
+        }
+      );
+    });
+  };
 
   const handleInput = (e) => {
     if (gameState.inGame){
@@ -103,7 +117,7 @@ useEffect(() => {
             error: false,
             errorIdx: -1          
           }
-        ))
+        ));
       } else {
         // Error
         setGameState(state => (
@@ -113,35 +127,30 @@ useEffect(() => {
             error: true,
             errorIdx: state.errorIdx === -1 ? findError(e.target.value) : state.errorIdx
           }
-        ))
+        ));
       }
     }
-  }
+  };
 
   // *** Helpers ***
  const validateInput = (inputString) => {
    const insepectFrom = gameState.validInput.length
-    if (passage.slice(insepectFrom, insepectFrom + inputString.length) !== inputString) {
-      return false
+    if (gameState.passage.slice(insepectFrom, insepectFrom + inputString.length) !== inputString) {
+      return false;
     } else {
-      return true
+      return true;
     }
-  }
+  };
 
   const findError = (inputString) => {
     // Find error. Because the user could move around in the input,
-      // it might not be the last character, but it will be in the last word.
-      console.log('in find error')
-      let idx = gameState.validInput.length + inputString.length;
-      
-      console.log('starting at: ', idx)
-      console.log('start idx', idx)
-      while (passage.slice(gameState.validInput.length, idx) === inputString.slice(0,idx)) {
-        idx++
-      }
-      console.log('error at: ', idx)
-      return idx - 1
-  }
+    // it might not be the last character, but it will be in the last word.
+    let idx = gameState.validInput.length + inputString.length;
+    while (gameState.passage.slice(gameState.validInput.length, idx) === inputString.slice(0,idx)) {
+      idx++;
+    }
+    return idx - 1;
+  };
 
   return (
     <div className="container">
@@ -159,76 +168,44 @@ useEffect(() => {
         <div className="App-main">
           <div className="App-game-status">
             <div className="App-player-status">
-              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
                 <i className="fas fa-truck-pickup fa-3x"/>
               </GameStatus>
               <PlayerStats pace={50} />
             </div>
             <div className="App-player-status">
-              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
                 <i className="fas fa-truck-pickup fa-3x"/>
               </GameStatus>
               <PlayerStats pace={50} />
             </div>
             <div className="App-player-status">
-              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
                 <i className="fas fa-truck-pickup fa-3x"/>
               </GameStatus>
               <PlayerStats pace={50} />
             </div>
             <div className="App-player-status">
-              <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
+              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
                 <i className="fas fa-truck-pickup fa-3x"/>
               </GameStatus>
               <PlayerStats pace={50} />
-            </div>
-           
+            </div> 
           </div>
-          
-            
-            {(gameState.inCountdown || gameState.inGame) &&
-              <div className="App-game-challange">
-                <div className="App-passage">
-                  <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
-                  <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
-                </div>
-              </div>
-            }
+          {(gameState.inCountdown || gameState.inGame || gameState.playerFinished) &&
+            <Board 
+              passage={gameState.passage} 
+              inputLength={gameState.validInput.length + gameState.input.length} 
+              input={gameState.input} 
+              error={gameState.error}
+              errorIdx={gameState.errorIdx}
+              handleInput={handleInput}
+            />
+          }
         </div>
       </div>
     </div>
+  );
+};
 
-
-    // <div className="App-game">
-    //   <Fade display={gameState.displayCountDown}>
-    //     <GameCountdown display={gameState.displayCountDown}>
-    //         <GameLight time={countDownTime} />
-    //         <GameTimer time={countDownTime} />
-    //       </GameCountdown>
-    //   </Fade>
-      
-    //   {gameState.startGame && <GameTimer time={time}/>}
-      
-    //   <div className="App-status">
-    //     <GameStatus passageLength={passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-    //       <i className="fas fa-truck-pickup fa-3x"/>
-    //     </GameStatus>
-    //     <PlayerStats pace={Math.round(gameState.wordCount/(time/60)) || 0} />
-    //   </div>
-    //   { gameState.inGame 
-    //     ? (
-    //       <div className="App-passage">
-    //         <GamePassage passage={passage} inputLength={gameState.validInput.length + gameState.input.length} error={gameState.error} errorIdx={gameState.errorIdx} />
-    //         <GameInput  input={gameState.input} error={gameState.error} handleInput={handleInput} /> 
-    //       </div>
-    //     )  : (
-    //     <button onClick={handleStartCountDown}>Start Game</button>
-    //     )
-    //   }
-    // </div>
-  )
-}
-Game.propTypes = {
-  passage: PropTypes.string.isRequired
-}
 export default Game;
