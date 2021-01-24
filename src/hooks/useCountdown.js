@@ -8,38 +8,38 @@ const useCountDown = () => {
   useEffect(() => {
     timerId.current = setInterval(() => {
       if (toggle) {
-        setSeconds(seconds => seconds - 1)
+        setSeconds(seconds => seconds - 1);
       }
     }, 1000)
     return () => {
-      clearInterval(timerId.current)
+      clearInterval(timerId.current);
     }
   }, [toggle])
 
   useEffect(() => {
     if (seconds === -2) {
-      setToggle(false)
-      setSeconds(null)
-      clearInterval(timerId.current)
-      
+      setToggle(false);
+      setSeconds(null);
+      clearInterval(timerId.current);
     }
   }, [seconds])
   
   const startCountDown = (startTime) => {
-    console.log('setting countdown to:', startTime)
-    setSeconds(startTime)
-    setToggle(true)
-  }
+    setSeconds(startTime);
+    setToggle(true);
+  };
 
   const countDownStatus = () => {
-    return toggle
-  }
+    return toggle;
+  };
+
   return (
     {
       countDownTime: seconds,
       startCountDown: startCountDown,
       countDownStatus: countDownStatus
     }
-  )
+  );
 }
+
 export default useCountDown;

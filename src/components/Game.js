@@ -12,23 +12,20 @@ import Timing from './Timing';
 
 // Set globals
 const COUNTDOWN_TIMER = 10
+const INITIAL_STATE = {
+  input: '',
+  validInput:  '',
+  error: false,
+  errorIdx: -1,
+  inCountdown: false,
+  inGame: false,
+  playerFinished: false,
+  wordCount: 0,  
+}
+
 
 const Game = ({ passage }) => {
-  const [gameState, setGameState] = useState({
-    // validatedInput: '', // Input string that has been cleared on a space
-    // activeInput:'', // Value shown in input
-    input: '',
-    validInput:  '',
-
-    error: false,
-    errorIdx: -1,
-    inCountdown: false,
-    inGame: false,
-    displayCountDown: false,
-    startGame: false,
-    finishGame: false,
-    wordCount: 0,  
-  });
+  const [gameState, setGameState] = useState(INITIAL_STATE);
 
   // Custom Hooks
   const { countDownTime, startCountDown, countDownStatus } = useCountDown()
@@ -75,7 +72,9 @@ useEffect(() => {
         ...state,
         input: '',
         validInput: state.validInput + state.input,
-        finishGame: true,
+        inCountdown: false,
+        inGame: false,
+        playerFinished: true,
         wordCount: state.wordCount + 1
       }
     ))
@@ -85,14 +84,13 @@ useEffect(() => {
 
 // *** Handlers ***
   const handleStartCountDown = () => {
-    startCountDown(COUNTDOWN_TIMER)
-    setGameState(state => (
+    startCountDown(COUNTDOWN_TIMER);
+    setGameState(
       {
-        ...state,
+        ...INITIAL_STATE,
         inCountdown: true,
-        inGame: false,
       }
-    ))
+    );
   }
 
   const handleInput = (e) => {
@@ -151,9 +149,11 @@ useEffect(() => {
         <div className="App-sidebar">
           <Timing  
             inCountdown={gameState.inCountdown}
-            inGame={gameState.inGame} 
+            inGame={gameState.inGame}
+            playerFinished={gameState.playerFinished} 
             handleStart={handleStartCountDown} 
-            time={gameState.inCountdown ? countDownTime : time} 
+            time={gameState.inCountdown ? countDownTime : time}
+            pace={Math.round(gameState.wordCount * 60/time)}
           />
         </div>
         <div className="App-main">

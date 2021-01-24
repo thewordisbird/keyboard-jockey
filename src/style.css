@@ -28,6 +28,7 @@
 .Start-light-container{
   width: 70%;
   height: 70%;
+  max-height: 350px;
   border-radius: 5px;
   background: rgba(0, 0, 0, .65);
   display: flex;
@@ -57,11 +58,26 @@
   background: green;
 }
 
+
+
+
 .App-timer{
   margin-left: 10px;
   font-size: 48px;
   color: rgba(0, 0, 0, .65);
-  
+}
+
+.Player-result{
+  font-size: 48px;
+  color: rgba(0, 0, 0, .65);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.Player-result-label{
+  font-size: 14px;
 }
 
 .App-main {
