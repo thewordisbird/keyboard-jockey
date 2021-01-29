@@ -1,7 +1,7 @@
 import React, {useState, useEffect } from 'react';
 
 import Timing from './Timing';
-import GameStatus from './GameStatus';
+import PlayerStatus from './PlayerStatus';
 import PlayerStats from './PlayerStats'
 import Board from './Board';
 
@@ -9,6 +9,7 @@ import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
 
 import passages from '../test-passages';
+import GameStatus from './GameStatus';
 
 // Set globals
 const COUNTDOWN_TIMER = 10;
@@ -23,6 +24,42 @@ const INITIAL_STATE = {
   wordCount: 0,
   passage:''  
 };
+
+// Mock Players
+const players = [
+  {
+    id: 0,
+    alias: 'thewordisbird',
+    avitar: '',
+    progress: 0,// The character of the string the player is it
+    pace: 0,
+    local: true
+  },
+  {
+    id: 1,
+    alias: 'player 2',
+    avitar: '',
+    progress: 0,// The character of the string the player is it
+    pace: 0,
+    local: false
+  },
+  {
+    id: 2,
+    alias: 'player 3',
+    avitar: '',
+    progress: 0,// The character of the string the player is it
+    pace: 0,
+    local: false
+  },
+  {
+    id: 3,
+    alias: 'player 4',
+    avitar: '',
+    progress: 0,// The character of the string the player is it
+    pace: 0,
+    local: false
+  },
+]
 
 const mockFetch = () => {
   return new Promise(
@@ -152,6 +189,8 @@ useEffect(() => {
     return idx - 1;
   };
 
+  
+
   return (
     <div className="container">
       <div className="App-game">
@@ -166,32 +205,8 @@ useEffect(() => {
           />
         </div>
         <div className="App-main">
-          <div className="App-game-status">
-            <div className="App-player-status">
-              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-                <i className="fas fa-truck-pickup fa-3x"/>
-              </GameStatus>
-              <PlayerStats pace={50} />
-            </div>
-            <div className="App-player-status">
-              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-                <i className="fas fa-truck-pickup fa-3x"/>
-              </GameStatus>
-              <PlayerStats pace={50} />
-            </div>
-            <div className="App-player-status">
-              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-                <i className="fas fa-truck-pickup fa-3x"/>
-              </GameStatus>
-              <PlayerStats pace={50} />
-            </div>
-            <div className="App-player-status">
-              <GameStatus passageLength={gameState.passage.length} position={gameState.error ? gameState.errorIdx : gameState.validInput.length + gameState.input.length}>
-                <i className="fas fa-truck-pickup fa-3x"/>
-              </GameStatus>
-              <PlayerStats pace={50} />
-            </div> 
-          </div>
+          <GameStatus players={players} passageLength={gameState.passage.length} />
+
           {(gameState.inCountdown || gameState.inGame || gameState.playerFinished) &&
             <Board 
               passage={gameState.passage} 

@@ -2,12 +2,12 @@
   margin:25px;
   display:  flex;
   justify-content: space-evenly;
-  height: 80vh;
+  /* height: 80vh; */
 }
 
 /* Sidebar Component Styling */
 .App-sidebar {
-  
+  min-height: 500px;
   margin: 2px;
   width: 15%;
   

@@ -1,34 +1,18 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
+import PlayerStatus from './PlayerStatus';
 
-
-const StatusBar = ({ passageLength, position, children }) => {
- 
-  const increment = 1/passageLength
-
-  // TODO: Make position a scale to cover the entire box for dynamic sizing
-  const statusBarEl = useRef();
-  const animateEl = useRef();
-  
-  useEffect(() => {
-    const width = statusBarEl.current.clientWidth
-    const scaledPosition = position * increment * width
-    // animate element movement from current pos to state pos
-    animateEl.current.animate([
-      { transform: `translateX(${scaledPosition}px)`}
-    ], {
-      duration: 1000,
-      fill: "forwards"
-      },
-    )
-  }, [position, statusBarEl])
-  
+const GameStatus = ({ players, passageLength }) => {
+  console.log(players)
   return (
-    <div className="App-track">
-      <div ref={statusBarEl} className="App-status-bar">
-        <div ref={animateEl} className="App-animate-avitar">{ children }</div>
-      </div>
+    <div className="App-game-status">
+      { players.map(player => (
+        <PlayerStatus key={player.id} player={player} passageLength={passageLength} >
+          {player.avitar === '' ? <i className="fas fa-truck-pickup fa-3x"/> : <img src={player.avitar} />}          
+        </PlayerStatus>
+      ))}
+      
     </div>
+    
   )
-}
-
-export default StatusBar;
+};
+export default GameStatus; 
