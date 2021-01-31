@@ -2,7 +2,7 @@ import React from 'react';
 import PlayerStatus from './PlayerStatus';
 
 const GameStatus = ({ players, passageLength }) => {
-  console.log(players)
+  // console.log(players)
   return (
     <div className="App-game-status">
       { players.map(player => (

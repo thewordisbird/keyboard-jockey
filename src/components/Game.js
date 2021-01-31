@@ -1,19 +1,18 @@
 import React, {useState, useEffect } from 'react';
-
+// Components
 import Timing from './Timing';
-import PlayerStatus from './PlayerStatus';
-import PlayerStats from './PlayerStats'
 import Board from './Board';
-
+import GameStatus from './GameStatus';
+// Custome Hooks
 import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
-
+// Other (tmp data for development)
 import passages from '../test-passages';
-import GameStatus from './GameStatus';
 
 // Set globals
 const COUNTDOWN_TIMER = 10;
 const INITIAL_STATE = {
+  id: '',
   input: '',
   validInput:  '',
   error: false,
@@ -26,14 +25,13 @@ const INITIAL_STATE = {
 };
 
 // Mock Players
-const players = [
+const mockPlayers = [
   {
     id: 0,
     alias: 'thewordisbird',
     avitar: '',
     progress: 0,// The character of the string the player is it
     pace: 0,
-    local: true
   },
   {
     id: 1,
@@ -41,7 +39,6 @@ const players = [
     avitar: '',
     progress: 0,// The character of the string the player is it
     pace: 0,
-    local: false
   },
   {
     id: 2,
@@ -49,15 +46,6 @@ const players = [
     avitar: '',
     progress: 0,// The character of the string the player is it
     pace: 0,
-    local: false
-  },
-  {
-    id: 3,
-    alias: 'player 4',
-    avitar: '',
-    progress: 0,// The character of the string the player is it
-    pace: 0,
-    local: false
   },
 ]
 
@@ -73,16 +61,48 @@ const mockFetch = () => {
 
 const Game = () => {
   const [gameState, setGameState] = useState(INITIAL_STATE);
+  const [players, setPlayers] = useState([]);
 
   // Custom Hooks
-  const { countDownTime, startCountDown, countDownStatus } = useCountDown();
+  const { countDownTime, startCountDown } = useCountDown();
   const { time, startTimer, stopTimer } = useTimer();
 
   // *** Side Effects ***
+  // Initialize Player
   useEffect(() => {
-    // Start the game when the countdown finishes
+    console.log('In init effect')
+    // Set id to websocket id once implemented
+    const id = '123qwe';
+    setGameState(
+      {
+        ...INITIAL_STATE,
+        id: id
+      }
+    );
+    // Once websocket is implemented, the initial state will be pulled from the server
+    // to bring in any player regisered before the client. Then add the client
+    // to the array and re-emit
+    setPlayers(() => {
+      const clientPlayer = {
+        id: id,
+        alias: '',
+        avitar: '',
+        progress: 0,// The character of the string the player is it
+        wordCount: 0,
+      };
+      const updatedPlayers = [...mockPlayers, clientPlayer];
+      return (
+       [
+         ...updatedPlayers
+       ]
+      )
+    })
+  }, []);
+
+  // Start the game when the countdown finishes
+  useEffect(() => {
     if (countDownTime === 0) {
-      console.log('starting timer')
+      console.log('Starting Countdown')
       startTimer()
       setGameState(state => (
         {
@@ -92,23 +112,53 @@ const Game = () => {
         }
       ))
     }
-  }, [countDownTime])
+  }, [countDownTime, startTimer])
 
- useEffect(() => {
-   // Reset Input on space if valid
-  console.log('In effect')
-  const { error, input } = gameState;
-  if (!error && input.slice(-1) === ' ') {
-    setGameState(state => (
-      {
-        ...state,
-        input: '',
-        validInput: state.validInput + input,
-        wordCount: state.wordCount + 1
+  
+
+  useEffect(() => {
+  console.log('Input Triggered Effect')
+  // Input word completion
+  const clearValidWord = () => {
+    const { error, input } = gameState;
+    if (!error && input.slice(-1) === ' ') {
+      setGameState(state => (
+        {
+          ...state,
+          input: '',
+          validInput: state.validInput + input,
+          wordCount: state.wordCount + 1
+        }
+      ))
+    }
+  };
+
+  const udpatePlayers = () => {
+    setPlayers (players => {
+      console.log('updating player informateion')
+      const playerIndex = players.findIndex(player => {
+        return player.id === gameState.id;
+      })
+      const updatedPlayer = {
+        ...players[playerIndex],
+        progress: gameState.validInput.length,
+        wordCount: gameState.wordCount
       }
-    ))
+      const updatedPlayers = [...players];
+      console.log('BEFORE:', updatedPlayers)
+      updatedPlayers[playerIndex] = updatedPlayer;
+      console.log('AFTER:', updatedPlayers)
+      return (
+        [
+          ...updatedPlayers
+        ]
+      );
+    })
   }
-}, [gameState.input])
+  clearValidWord();
+  udpatePlayers();
+  // emitPlayerStatus(); 
+}, [gameState.input ])
 
 useEffect(() => {
   // Finish game when input matches passage
@@ -134,13 +184,13 @@ useEffect(() => {
     mockFetch()
     .then(passage => {
       startCountDown(COUNTDOWN_TIMER);
-      setGameState(
+      setGameState(gameState => (
         {
-          ...INITIAL_STATE,
+          ...gameState,
           inCountdown: true,
           passage: passage.passage
         }
-      );
+      ));
     });
   };
 
@@ -189,8 +239,6 @@ useEffect(() => {
     return idx - 1;
   };
 
-  
-
   return (
     <div className="container">
       <div className="App-game">
@@ -205,9 +253,12 @@ useEffect(() => {
           />
         </div>
         <div className="App-main">
-          <GameStatus players={players} passageLength={gameState.passage.length} />
+          <GameStatus 
+            players={players} 
+            passageLength={gameState.passage.length} />
 
-          {(gameState.inCountdown || gameState.inGame || gameState.playerFinished) &&
+          {
+            (gameState.inCountdown || gameState.inGame || gameState.playerFinished) &&
             <Board 
               passage={gameState.passage} 
               inputLength={gameState.validInput.length + gameState.input.length} 

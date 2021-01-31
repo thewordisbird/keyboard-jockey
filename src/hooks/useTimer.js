@@ -9,7 +9,7 @@ const useTimer = () => {
     if (toggle){
     timerId.current = setInterval(() => {
       setSeconds(seconds => {
-        console.log(seconds)
+        
         return seconds + 1 
       })
     }, 1000)}
