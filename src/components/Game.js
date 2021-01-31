@@ -1,19 +1,21 @@
 import React, {useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+
 // Components
 import Timing from './Timing';
 import Board from './Board';
 import GameStatus from './GameStatus';
 // Custome Hooks
+import useWebsocket from '../hooks/useWebsocket';
 import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
 // Other (tmp data for development)
 import passages from '../test-passages';
 
-const WEBSOCKET_ENDPOINT = "localhost:3001";
+
 
 
 // Set globals
+const WEBSOCKET_ENDPOINT = "localhost:3001";
 const COUNTDOWN_TIMER = 10;
 const INITIAL_STATE = {
   id: '',
@@ -65,56 +67,32 @@ const mockFetch = () => {
 
 const Game = () => {
   const [gameState, setGameState] = useState(INITIAL_STATE);
-  const [players, setPlayers] = useState([]);
+  // const [players, setPlayers] = useState([]);
 
   // Custom Hooks
+  const {clientId, players, updatePlayer } = useWebsocket(WEBSOCKET_ENDPOINT);
   const { countDownTime, startCountDown } = useCountDown();
   const { time, startTimer, stopTimer } = useTimer();
 
   // *** Side Effects ***
   // Initialize Player
   useEffect(() => {
-    const socket = io(WEBSOCKET_ENDPOINT);
+    setGameState(gameState => (
+      {
+        ...gameState,
+        id: clientId
+      }
+    ))
+  }, [clientId])
 
-    socket.on('connect', () => {
-
-      console.log('Websocket Resp:', resp)
-      const id = socket.id;
-      setGameState(() => (
-        {
-          ...INITIAL_STATE,
-          id: id
-        }
-      ));
   
-      setPlayers(() => {
-        const clientPlayer = {
-          id: id,
-          alias: '',
-          avitar: '',
-          progress: 0,// The character of the string the player is it
-          wordCount: 0,
-        };
-        const updatedPlayers = [...mockPlayers, clientPlayer];
-        return (
-         [
-           ...updatedPlayers
-         ]
-        )
-      })
-    })  
-
-    socket.on('new player', (resp) => {
-      console.log('Websocket Resp:', resp)
-    })
-  }, []);
-
+  
  
 
   // Start the game when the countdown finishes
   useEffect(() => {
     if (countDownTime === 0) {
-      console.log('Starting Countdown')
+      console.log('Starting Game')
       startTimer()
       setGameState(state => (
         {
@@ -124,52 +102,50 @@ const Game = () => {
         }
       ))
     }
-  }, [countDownTime, startTimer])
+  }, [countDownTime])
 
   
 
   useEffect(() => {
-  console.log('Input Triggered Effect')
-  // Input word completion
-  const clearValidWord = () => {
-    const { error, input } = gameState;
-    if (!error && input.slice(-1) === ' ') {
-      setGameState(state => (
-        {
-          ...state,
-          input: '',
-          validInput: state.validInput + input,
-          wordCount: state.wordCount + 1
+    if ('input' in gameState) {
+      console.log('Input Triggered Effect')
+      // Input word completion
+      const clearValidWord = () => {
+        const { error, input } = gameState;
+        if (!error && input.slice(-1) === ' ') {
+          setGameState(state => (
+            {
+              ...state,
+              input: '',
+              validInput: state.validInput + input,
+              wordCount: state.wordCount + 1
+            }
+          ))
         }
-      ))
-    }
-  };
+      };
 
-  const udpatePlayers = () => {
-    setPlayers (players => {
-      console.log('updating player informateion')
-      const playerIndex = players.findIndex(player => {
-        return player.id === gameState.id;
-      })
-      const updatedPlayer = {
-        ...players[playerIndex],
-        progress: gameState.validInput.length,
-        wordCount: gameState.wordCount
+      if (players) {
+        
+        const player = players.filter(player => player.id === gameState.id)[0]
+        console.log('Player Before:', player)
+         const updatedPlayer = {
+          ...player,
+          progress: gameState.validInput.length,
+          wordCount: gameState.wordCount
+        }
+        console.log('Player After:', updatedPlayer)
+        updatePlayer(updatedPlayer)
       }
-      const updatedPlayers = [...players];
-      console.log('BEFORE:', updatedPlayers)
-      updatedPlayers[playerIndex] = updatedPlayer;
-      console.log('AFTER:', updatedPlayers)
-      return (
-        [
-          ...updatedPlayers
-        ]
-      );
-    })
+      
+     
+      
+     
+
+      clearValidWord();
+      // udpatePlayers();
+      // emitPlayerStatus(); 
   }
-  clearValidWord();
-  udpatePlayers();
-  // emitPlayerStatus(); 
+  
 }, [gameState.input ])
 
 useEffect(() => {
@@ -266,7 +242,7 @@ useEffect(() => {
         </div>
         <div className="App-main">
           <GameStatus 
-            players={players} 
+            players={players || []} 
             passageLength={gameState.passage.length} />
 
           {
