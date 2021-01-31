@@ -1,4 +1,5 @@
 import React, {useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 // Components
 import Timing from './Timing';
 import Board from './Board';
@@ -8,6 +9,9 @@ import useTimer from '../hooks/useTimer';
 import useCountDown from '../hooks/useCountdown';
 // Other (tmp data for development)
 import passages from '../test-passages';
+
+const WEBSOCKET_ENDPOINT = "localhost:3001";
+
 
 // Set globals
 const COUNTDOWN_TIMER = 10;
@@ -70,34 +74,42 @@ const Game = () => {
   // *** Side Effects ***
   // Initialize Player
   useEffect(() => {
-    console.log('In init effect')
-    // Set id to websocket id once implemented
-    const id = '123qwe';
-    setGameState(
-      {
-        ...INITIAL_STATE,
-        id: id
-      }
-    );
-    // Once websocket is implemented, the initial state will be pulled from the server
-    // to bring in any player regisered before the client. Then add the client
-    // to the array and re-emit
-    setPlayers(() => {
-      const clientPlayer = {
-        id: id,
-        alias: '',
-        avitar: '',
-        progress: 0,// The character of the string the player is it
-        wordCount: 0,
-      };
-      const updatedPlayers = [...mockPlayers, clientPlayer];
-      return (
-       [
-         ...updatedPlayers
-       ]
-      )
+    const socket = io(WEBSOCKET_ENDPOINT);
+
+    socket.on('connect', () => {
+
+      console.log('Websocket Resp:', resp)
+      const id = socket.id;
+      setGameState(() => (
+        {
+          ...INITIAL_STATE,
+          id: id
+        }
+      ));
+  
+      setPlayers(() => {
+        const clientPlayer = {
+          id: id,
+          alias: '',
+          avitar: '',
+          progress: 0,// The character of the string the player is it
+          wordCount: 0,
+        };
+        const updatedPlayers = [...mockPlayers, clientPlayer];
+        return (
+         [
+           ...updatedPlayers
+         ]
+        )
+      })
+    })  
+
+    socket.on('new player', (resp) => {
+      console.log('Websocket Resp:', resp)
     })
   }, []);
+
+ 
 
   // Start the game when the countdown finishes
   useEffect(() => {
