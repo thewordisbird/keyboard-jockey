@@ -11,9 +11,6 @@ import useCountDown from '../hooks/useCountdown';
 // Other (tmp data for development)
 import passages from '../test-passages';
 
-
-
-
 // Set globals
 const WEBSOCKET_ENDPOINT = "localhost:3001";
 const COUNTDOWN_TIMER = 10;
@@ -67,10 +64,9 @@ const mockFetch = () => {
 
 const Game = () => {
   const [gameState, setGameState] = useState(INITIAL_STATE);
-  // const [players, setPlayers] = useState([]);
 
   // Custom Hooks
-  const {clientId, players, updatePlayer } = useWebsocket(WEBSOCKET_ENDPOINT);
+  const {clientId, players, globalGameState, updatePlayer, updateGlobalGameState } = useWebsocket(WEBSOCKET_ENDPOINT);
   const { countDownTime, startCountDown } = useCountDown();
   const { time, startTimer, stopTimer } = useTimer();
 
@@ -84,10 +80,6 @@ const Game = () => {
       }
     ))
   }, [clientId])
-
-  
-  
- 
 
   // Start the game when the countdown finishes
   useEffect(() => {
@@ -103,8 +95,6 @@ const Game = () => {
       ))
     }
   }, [countDownTime])
-
-  
 
   useEffect(() => {
     if ('input' in gameState) {
@@ -124,8 +114,7 @@ const Game = () => {
         }
       };
 
-      if (players) {
-        
+      if (players) {        
         const player = players.filter(player => player.id === gameState.id)[0]
         console.log('Player Before:', player)
          const updatedPlayer = {
@@ -137,10 +126,6 @@ const Game = () => {
         updatePlayer(updatedPlayer)
       }
       
-     
-      
-     
-
       clearValidWord();
       // udpatePlayers();
       // emitPlayerStatus(); 
@@ -168,6 +153,7 @@ useEffect(() => {
 
 // *** Handlers ***
   const handleStartCountDown = () => {
+    /* Starts the game and emits the message thru the websocket */
     // Fetch data from server
     mockFetch()
     .then(passage => {
@@ -178,7 +164,9 @@ useEffect(() => {
           inCountdown: true,
           passage: passage.passage
         }
+      
       ));
+      
     });
   };
 
