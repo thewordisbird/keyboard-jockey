@@ -66,7 +66,7 @@ const Game = () => {
   const [gameState, setGameState] = useState(INITIAL_STATE);
 
   // Custom Hooks
-  const {clientId, players, globalGameState, updatePlayer, updateGlobalGameState } = useWebsocket(WEBSOCKET_ENDPOINT);
+  const {clientId, players, globalGameState, updatePlayer, updateGlobalGameState, joinGame } = useWebsocket(WEBSOCKET_ENDPOINT);
   const { countDownTime, startCountDown } = useCountDown();
   const { time, startTimer, stopTimer } = useTimer();
 
@@ -157,6 +157,7 @@ useEffect(() => {
     // Fetch data from server
     mockFetch()
     .then(passage => {
+      joinGame();
       startCountDown(COUNTDOWN_TIMER);
       setGameState(gameState => (
         {

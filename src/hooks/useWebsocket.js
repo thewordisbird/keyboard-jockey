@@ -12,20 +12,8 @@ const useWebsocket = (Endpoint) => {
   useEffect(() => {
     socket.current = io(Endpoint);
 
-    socket.current.on('newPlayer', data => {
-      setClientId(data.playerId)
-      setPlayers(data.players)
-    });
-
-    socket.current.on('updatedPlayers', data => {
-      console.log('EMITTING Updated Player', data)
-      console.log('Updated Players:', data)
-      setPlayers(data)
-    })
-
-    socket.current.on('updateGlobalGameState', data => {
-      console.log('EMITTING Updated Global Game State', data)
-      setGlobalGameState(data)
+    socket.current.on('updateGame', data => {
+      console.log('updateGame: ', JSON.parse(data))
     })
 
     return () => {
@@ -33,8 +21,12 @@ const useWebsocket = (Endpoint) => {
     }
   }, [Endpoint])
 
+  const joinGame = () => {
+    console.log('emmiting to joinGame')
+    socket.current.emit('joinGame')
+  }
 
-  const updatePlayer = (updatedPlayer) => {
+  const updateGameState = (updatedPlayer) => {
     socket.current.emit('updatePlayer', updatedPlayer)
   }
 
@@ -42,14 +34,15 @@ const useWebsocket = (Endpoint) => {
     socket.current.emit('updateGlobalGameState', updatedGlobalGameState)
   }
 
-  const startGlobalGame = () => {
-    socket.current.emit('startGlobalGame')
-  }
+  // const startGlobalGame = () => {
+  //   socket.current.emit('startGlobalGame')
+  // }
 
   return {
     clientId: clientId, 
     players: players, 
     globalGameState: globalGameState, 
+    joinGame: joinGame,
     updatePlayer: updatePlayer,
     updateGlobalGameState: updateGlobalGameState
   }
