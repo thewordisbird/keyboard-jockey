@@ -12,8 +12,18 @@ const useWebsocket = (Endpoint) => {
   useEffect(() => {
     socket.current = io(Endpoint);
 
+    // socket.current.on('testServer', message => {
+    //   console.log(message)
+    // })
+    // socket.current.onevent(message=> {
+    //   console.log(message)
+    // })
     socket.current.on('updateGame', data => {
       console.log('updateGame: ', JSON.parse(data))
+    })
+
+    socket.current.on('message', data => {
+      console.log(data)
     })
 
     return () => {
@@ -21,6 +31,12 @@ const useWebsocket = (Endpoint) => {
     }
   }, [Endpoint])
 
+  // useEffect(() => {
+  //   setInterval(()=>{
+  //     console.log('emitting test')
+  //     socket.current.emit('testClient', 'Ground control to major tom')
+  //   },2000)
+  // })
   const joinGame = () => {
     console.log('emmiting to joinGame')
     socket.current.emit('joinGame')
@@ -43,8 +59,6 @@ const useWebsocket = (Endpoint) => {
     players: players, 
     globalGameState: globalGameState, 
     joinGame: joinGame,
-    updatePlayer: updatePlayer,
-    updateGlobalGameState: updateGlobalGameState
   }
 };
 
